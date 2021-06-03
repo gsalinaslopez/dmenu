@@ -8,48 +8,6 @@ Subject: [PATCH] Updated xyw for 5.0 properly
  dmenu.c | 22 ++++++++++++++++------
  2 files changed, 40 insertions(+), 6 deletions(-)
 
-diff --git a/dmenu.1 b/dmenu.1
-index 323f93c..a4ecbbb 100644
---- a/dmenu.1
-+++ b/dmenu.1
-@@ -8,6 +8,12 @@ dmenu \- dynamic menu
- .IR lines ]
- .RB [ \-m
- .IR monitor ]
-+.RB [ \-x
-+.IR xoffset ]
-+.RB [ \-y
-+.IR yoffset ]
-+.RB [ \-z
-+.IR width ]
- .RB [ \-p
- .IR prompt ]
- .RB [ \-fn
-@@ -54,6 +60,24 @@ dmenu lists items vertically, with the given number of lines.
- dmenu is displayed on the monitor number supplied. Monitor numbers are starting
- from 0.
- .TP
-+.BI \-x " xoffset"
-+dmenu is placed at this offset measured from the left side of the monitor.
-+Can be negative.
-+If option
-+.B \-m
-+is present, the measurement will use the given monitor.
-+.TP
-+.BI \-y " yoffset"
-+dmenu is placed at this offset measured from the top of the monitor.  If the
-+.B \-b
-+option is used, the offset is measured from the bottom.  Can be negative.
-+If option
-+.B \-m
-+is present, the measurement will use the given monitor.
-+.TP
-+.BI \-z " width"
-+sets the width of the dmenu window.
-+.TP
- .BI \-p " prompt"
- defines the prompt to be displayed to the left of the input field.
- .TP
 diff --git a/dmenu.c b/dmenu.c
 index 65f25ce..7be19ae 100644
 --- a/dmenu.c
@@ -67,7 +25,7 @@ index 65f25ce..7be19ae 100644
 @@ -637,9 +640,9 @@ setup(void)
  				if (INTERSECT(x, y, 1, 1, info[i]))
  					break;
- 
+
 -		x = info[i].x_org;
 -		y = info[i].y_org + (topbar ? 0 : info[i].height - mh);
 -		mw = info[i].width;
@@ -90,27 +48,3 @@ index 65f25ce..7be19ae 100644
  	}
  	promptw = (prompt && *prompt) ? TEXTW(prompt) - lrpad / 4 : 0;
  	inputw = MIN(inputw, mw/3);
-@@ -690,6 +693,7 @@ static void
- usage(void)
- {
- 	fputs("usage: dmenu [-bfiv] [-l lines] [-p prompt] [-fn font] [-m monitor]\n"
-+	      "             [-x xoffset] [-y yoffset] [-z width]\n"
- 	      "             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]\n", stderr);
- 	exit(1);
- }
-@@ -717,6 +721,12 @@ main(int argc, char *argv[])
- 		/* these options take one argument */
- 		else if (!strcmp(argv[i], "-l"))   /* number of lines in vertical list */
- 			lines = atoi(argv[++i]);
-+		else if (!strcmp(argv[i], "-x"))   /* window x offset */
-+			dmx = atoi(argv[++i]);
-+		else if (!strcmp(argv[i], "-y"))   /* window y offset (from bottom up if -b) */
-+			dmy = atoi(argv[++i]);
-+		else if (!strcmp(argv[i], "-z"))   /* make dmenu this wide */
-+			dmw = atoi(argv[++i]);
- 		else if (!strcmp(argv[i], "-m"))
- 			mon = atoi(argv[++i]);
- 		else if (!strcmp(argv[i], "-p"))   /* adds prompt to left of input field */
--- 
-2.28.0
-
